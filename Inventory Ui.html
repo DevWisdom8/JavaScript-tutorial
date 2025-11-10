@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Inventory Manager</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, button { margin: 5px 0; padding: 6px; }
+    .log { margin-top: 15px; white-space: pre-line; border: 1px solid #ccc; padding: 10px; height: 120px; overflow-y: auto; }
+  </style>
+</head>
+<body>
+  <h2>Inventory Manager</h2>
+
+  <label>Product Name:</label><br>
+  <input id="name" type="text"><br>
+
+  <label>Quantity:</label><br>
+  <input id="qty" type="number"><br>
+
+  <button onclick="addProductUI()">Add Product</button>
+  <button onclick="removeProductUI()">Remove Product</button>
+
+  <div class="log" id="log"></div>
+
+  <script>
+    let inventory = [];
+
+    function findProductIndex(productName) {
+      productName = productName.toLowerCase();
+      return inventory.findIndex(item => item.name === productName);
+    }
+
+    function addProduct(product) {
+      let name = product.name.toLowerCase();
+      let index = findProductIndex(name);
+      if (index !== -1) {
+        inventory[index].quantity += product.quantity;
+        log(name + " quantity updated");
+      } else {
+        inventory.push({ name: name, quantity: product.quantity });
+        log(name + " added to inventory");
+      }
+    }
+
+    function removeProduct(productName, quantity) {
+      let name = productName.toLowerCase();
+      let index = findProductIndex(name);
+      if (index === -1) {
+        log(name + " not found");
+        return;
+      }
+      let product = inventory[index];
+      if (product.quantity < quantity) {
+        log(`Not enough ${name} available, remaining pieces: ${product.quantity}`);
+        return;
+      }
+      product.quantity -= quantity;
+      if (product.quantity === 0) {
+        inventory.splice(index, 1);
+      } else {
+        log(`Remaining ${name} pieces: ${product.quantity}`);
+      }
+    }
+
+    function log(message) {
+      const logBox = document.getElementById("log");
+      logBox.textContent += message + "\n";
+      logBox.scrollTop = logBox.scrollHeight;
+    }
+
+    function addProductUI() {
+      const name = document.getElementById("name").value;
+      const qty = parseInt(document.getElementById("qty").value);
+      if (!name || !qty) return;
+      addProduct({ name, quantity: qty });
+    }
+
+    function removeProductUI() {
+      const name = document.getElementById("name").value;
+      const qty = parseInt(document.getElementById("qty").value);
+      if (!name || !qty) return;
+      removeProduct(name, qty);
+    }
+  </script>
+</body>
+</html>
